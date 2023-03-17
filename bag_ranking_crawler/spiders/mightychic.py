@@ -1,13 +1,6 @@
 import scrapy
+from ..items import BagRankingCrawlerItem
 
-
-class Item(scrapy.Item):
-    title = scrapy.Field()
-    price = scrapy.Field()
-    link = scrapy.Field()
-    thumbnail = scrapy.Field()
-    description = scrapy.Field()
-    images = scrapy.Field()
 
 
 class ProductSpider(scrapy.Spider):
@@ -28,7 +21,7 @@ class ProductSpider(scrapy.Spider):
             thumbnail = 'https:' + \
                 product.css('img').xpath(
                     "@data-src").get().replace('{width}', '1600')
-            item = Item()
+            item = BagRankingCrawlerItem()
             item['title'] = title
             item['price'] = price
             item['link'] = link
@@ -50,7 +43,9 @@ class ProductSpider(scrapy.Spider):
         slides = response.css(".product__slideshow-slide")
         images = []
         for slide in slides:
-            image = 'https:' + slide.xpath("@data-media-large-url").get()
-            images.append(image)
+            lmao = slide.xpath("@data-media-large-url").get()
+            if lmao is not None and lmao is str:
+                image = 'https:' + lmao 
+                images.append(image)
         item['images'] = images
         yield item

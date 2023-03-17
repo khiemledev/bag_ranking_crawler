@@ -1,52 +1,131 @@
 import scrapy
+import json
+from ..items import BagRankingCrawlerItem
 
-
-class Item(scrapy.Item):
-    title = scrapy.Field()
-    price = scrapy.Field()
-    link = scrapy.Field()
-    thumbnail = scrapy.Field()
-    description = scrapy.Field()
-    images = scrapy.Field()
 
 
 class ProductSpider(scrapy.Spider):
     name = "vestiairecollective"
-    start_urls = [
-        "https://www.vestiairecollective.com/hermes/p-{}/#brand=Herm%C3%A8s%2314".format(i) for i in range(1, 2)]
+
+    def start_requests(self):
+        url = 'https://search.vestiairecollective.com/v1/product/search'
+        headers = {
+            "accept": "application/json, text/plain, */*",
+            "content-type": "application/json",
+            "sec-ch-ua": "\"Microsoft Edge\";v=\"111\", \"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"111\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+        }
+        for i in range(50):
+            body = {
+                "pagination": {
+                    "offset": i * 200,
+                    "limit": 200
+                },
+                "fields": [
+                    "name",
+                    "description",
+                    "brand",
+                    "model",
+                    "country",
+                    "price",
+                    "discount",
+                    "link",
+                    "sold",
+                    "likes",
+                    "editorPicks",
+                    "shouldBeGone",
+                    "seller",
+                    "directShipping",
+                    "local",
+                    "pictures",
+                    "colors",
+                    "size",
+                    "stock",
+                    "universeId"
+                ],
+                "facets": {
+                    "fields": [
+                        "brand",
+                        "universe",
+                        "country",
+                        "stock",
+                        "color",
+                        "categoryLvl0",
+                        "priceRange",
+                        "price",
+                        "condition",
+                        "region",
+                        "editorPicks",
+                        "watchMechanism",
+                        "discount",
+                        "sold",
+                        "directShippingEligible",
+                        "directShippingCountries",
+                        "localCountries",
+                        "sellerBadge",
+                        "isOfficialStore",
+                        "materialLvl0",
+                        "size0",
+                        "size1",
+                        "size2",
+                        "size3",
+                        "size4",
+                        "size5",
+                        "size6",
+                        "size7",
+                        "size8",
+                        "size9",
+                        "size10",
+                        "size11",
+                        "size12",
+                        "size13",
+                        "size14",
+                        "size15",
+                        "size16",
+                        "size17",
+                        "size18",
+                        "size19",
+                        "size20",
+                        "size21",
+                        "size22",
+                        "size23",
+                        "model",
+                        "dealEligible"
+                    ],
+                    "stats": [
+                        "price"
+                    ]
+                },
+                "q": None,
+                "sortBy": "relevance",
+                "filters": {
+                    "catalogLinksWithoutLanguage": [
+                        "/hermes/"
+                    ],
+                    "brand.id": [
+                        "14"
+                    ]
+                },
+                "locale": {
+                    "country": "VN",
+                    "currency": "USD",
+                    "language": "us",
+                    "sizeType": "US"
+                },
+                "mySizes": None
+            }
+            yield scrapy.Request(url=url, method='POST', headers=headers, body=json.dumps(body), callback=self.parse)
 
     def parse(self, response):
-        # Extract product information
-        products = response.css(".product-card_productCard__2JCqK")
-        print(products)
-        for product in products:
-            title = product.css("span").xpath(".//a/text()").get()
-            link = product.css(
-                ".product-card_productCard__productDetails__KIQmB").xpath(".//a/@href").get()
-            price = product.xpath(
-                ".//span[@class='product-card_productCard__text--price___l1Dn']/text()").get()
-            thumbnail = 'https:' + \
-                product.css(
-                    '.vc-images_imageContainer__Sau2S').xpath("@src").get()
-            item = Item()
-            item['title'] = title
-            item['price'] = price
-            item['link'] = link
-            item['thumbnail'] = thumbnail
+        data = json.loads(response.body)
+        items = data['items']
+        for item in items:
+            item = BagRankingCrawlerItem(
+                title=item['name'],
+                price=item['price']['cents'],
+                link='https://www.vestiairecollective.com' + item['link'],
+                thumbnail='https://images.vestiairecollective.com'+item['pictures'][0],
+                description=item['description'],
+            )
             yield item
-            # yield response.follow(url=link, callback=self.product_parse, meta={'item': item})
-
-    # def product_parse(self, response):
-    #     item = response.meta['item']
-    #     description = response.css(
-    #         ".product__description").xpath('.//text()').extract()
-    #     description = ' '.join(description).strip()
-    #     item['description'] = description
-
-    #     slides = response.css(".product__slideshow-slide")
-    #     images = []
-    #     for slide in slides:
-    #         image = 'https:' + slide.xpath("@data-media-large-url").get()
-    #         images.append(image)
-    #     item['images'] = images
-    #     yield item
