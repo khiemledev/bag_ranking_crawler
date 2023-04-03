@@ -13,3 +13,10 @@ class BagRankingCrawlerItem(scrapy.Item):
     thumbnail = scrapy.Field()
     description = scrapy.Field()
     images = scrapy.Field()
+
+
+class BagPriceCrawlerItem(scrapy.Item):
+    price = scrapy.Field()
+    date = scrapy.Field()
+    bag_id = scrapy.Field()
+    
