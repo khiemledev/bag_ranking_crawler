@@ -5,7 +5,7 @@ from ..items import BagRankingCrawlerItem
 class ProductSpider(scrapy.Spider):
     name = "bjluxury"
     start_urls = [
-        "https://bjluxury.com/all-hermes-bags/?product-page={}&count=36".format(i) for i in range(1, 2)]
+        "https://bjluxury.com/all-hermes-bags/?product-page={}&count=36".format(i) for i in range(1, 500)]
 
     def parse(self, response):
         # Extract product information
@@ -17,7 +17,7 @@ class ProductSpider(scrapy.Spider):
                 ".woocommerce-loop-product__title").xpath('.//text()').get()
             price = product.css('.woocommerce-Price-amount')
             if price is not None:
-                price = price.xpath('.//text()').getall()
+                price = ' '.join(price.xpath('.//text()').getall())
             else:
                 price = None
             thumbnail = product.css('.wp-post-image').xpath("@src").get()
@@ -30,8 +30,23 @@ class ProductSpider(scrapy.Spider):
 
     def product_parse(self, response):
         item = response.meta['item']
-        desc = response.css('.woocommerce-product-attributes').xpath('.//text()').getall()
-        item['description'] = desc
+
+        shop_attributes = response.css('.shop_attributes')
+        item['brand'] = shop_attributes.css(
+            'tr:nth-child(1) > td').xpath('.//text()').get()
+        item['model'] = response.css(
+            'tr:nth-child(2) > td').xpath('.//text()').get()
+        item['color'] = response.css(
+            'tr:nth-child(4) > td').xpath('.//text()').get()
+        item['material'] = response.css(
+            'tr:nth-child(5) > td').xpath('.//text()').get()
+        item['hardware'] = response.css(
+            'tr:nth-child(6) > td').xpath('.//text()').get()
+        item['year'] = response.css(
+            'tr:nth-child(7) > td').xpath('.//text()').get()
+        item['measurements'] = response.css(
+            'tr:nth-child(10) > td').xpath('.//text()').get()
+
         images = response.css('.summary-before')
         images = images.css('img').xpath('@src').getall()
         images = ['https:' + image for image in images]

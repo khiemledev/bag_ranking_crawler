@@ -11,6 +11,7 @@ BOT_NAME = "bag_ranking_crawler"
 
 SPIDER_MODULES = ["bag_ranking_crawler.spiders"]
 NEWSPIDER_MODULE = "bag_ranking_crawler.spiders"
+COMMANDS_MODULE = 'bag_ranking_crawler.commands'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -62,9 +63,9 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    "bag_ranking_crawler.pipelines.BagRankingCrawlerPipeline": 300,
-#}
+ITEM_PIPELINES = {
+   "bag_ranking_crawler.pipelines.BagPipeline": 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
