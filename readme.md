@@ -1,0 +1,3 @@
+```bash
+scrapy runall --nolog
+```

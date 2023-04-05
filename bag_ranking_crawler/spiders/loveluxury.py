@@ -5,7 +5,7 @@ from ..items import BagRankingCrawlerItem
 class ProductSpider(scrapy.Spider):
     name = "loveluxury"
     start_urls = [
-        "https://loveluxury.co.uk/shop/hermes/page/{}".format(i) for i in range(1, 13)]
+        "https://loveluxury.co.uk/shop/hermes/page/{}".format(i) for i in range(1, 100)]
 
     def parse(self, response):
         # Extract product information

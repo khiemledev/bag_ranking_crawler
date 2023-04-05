@@ -7,8 +7,8 @@ class ProductSpider(scrapy.Spider):
     name = "farfetch"
     start_urls = [
         *["https://www.farfetch.com/vn/plpslice/listing-api/products-facets?page={}&view=90&scale=274&pagetype=Shopping&rootCategory=Women&pricetype=FullPrice&c-designer=70015".format(
-            i) for i in range(1, 50)],
-        *["https://www.farfetch.com/vn/plpslice/listing-api/products-facets?page={}&view=90&scale=274&pagetype=Shopping&rootCategory=Men&pricetype=FullPrice&c-designer=70015".format(i) for i in range(1, 10)],]
+            i) for i in range(1, 100)],
+        *["https://www.farfetch.com/vn/plpslice/listing-api/products-facets?page={}&view=90&scale=274&pagetype=Shopping&rootCategory=Men&pricetype=FullPrice&c-designer=70015".format(i) for i in range(1, 100)],]
 
     def parse(self, response):
         # Extract product information
