@@ -46,6 +46,8 @@ class ProductSpider(scrapy.Spider):
             'tr:nth-child(7) > td').xpath('.//text()').get()
         item['measurements'] = response.css(
             'tr:nth-child(10) > td').xpath('.//text()').get()
+        item['condition'] = response.css(
+            'tr:nth-child(9) > td').xpath('.//text()').get()
 
         images = response.css('.summary-before')
         images = images.css('img').xpath('@src').getall()

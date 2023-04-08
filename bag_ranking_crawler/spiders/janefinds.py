@@ -40,6 +40,7 @@ class ProductSpider(scrapy.Spider):
         color_re = re.compile(r'Color: (.+)')
         hardware_re = re.compile(r'Hardware: (.+)')
         material_re = re.compile(r'Material: (.+)')
+        condition_re = re.compile(r'Condition: (.+)')
 
         size = size_re.search(desc)
         if size is not None:
@@ -64,12 +65,18 @@ class ProductSpider(scrapy.Spider):
             material = material.group(1)
         else:
             material = None
-        item['measurements'] = size
-        item['color'] = color
-        item['hardware'] = hardware
-        item['material'] = material
 
-        item['description'] = desc
+        condition = condition_re.search(desc)
+        if condition is not None:
+            condition = condition.group(1)
+        else:
+            condition = None
+        item['measurements'] = size.strip()
+        item['color'] = color.strip()
+        item['hardware'] = hardware.strip()
+        item['material'] = material.strip()
+        item['condition'] = condition.strip()
+        item['description'] = desc.strip()
         images = response.css('css-slider')
         images = images.css('img').xpath('@src').getall()
         images = ['https:' + image for image in images]
