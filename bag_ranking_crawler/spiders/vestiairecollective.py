@@ -18,8 +18,8 @@ class ProductSpider(scrapy.Spider):
             "x-usertoken": "anonymous-d08ba9dd-c8ae-4217-a003-2393905f4140",
             "x-correlation-id": "2c36a52c-3ba5-4b61-b9f7-457a92c11fab"
         }
-        for x in [True, ]:
-            for i in range(1):
+        for x in [True,False ]:
+            for i in range(500):
                 body = {
                     "pagination": {
                         "offset": i*200,
