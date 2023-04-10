@@ -18,106 +18,107 @@ class ProductSpider(scrapy.Spider):
             "x-usertoken": "anonymous-d08ba9dd-c8ae-4217-a003-2393905f4140",
             "x-correlation-id": "2c36a52c-3ba5-4b61-b9f7-457a92c11fab"
         }
-        for x in [True,False ]:
-            for i in range(500):
-                body = {
-                    "pagination": {
-                        "offset": i*200,
-                        "limit": 200
-                    },
+        for i in range(500):
+            body = {
+                "pagination": {
+                    "offset": i*96,
+                    "limit": 96
+                },
+                "fields": [
+                    "name",
+                    "description",
+                    "brand",
+                    "model",
+                    "country",
+                    "price",
+                    "discount",
+                    "link",
+                    "sold",
+                    "likes",
+                    "editorPicks",
+                    "shouldBeGone",
+                    "seller",
+                    "directShipping",
+                    "local",
+                    "pictures",
+                    "colors",
+                    "size",
+                    "stock",
+                    "universeId"
+                ],
+                "facets": {
                     "fields": [
-                        "name",
-                        "description",
                         "brand",
-                        "model",
+                        "universe",
                         "country",
-                        "price",
-                        "discount",
-                        "link",
-                        "sold",
-                        "likes",
-                        "editorPicks",
-                        "shouldBeGone",
-                        "seller",
-                        "directShipping",
-                        "local",
-                        "pictures",
-                        "colors",
-                        "size",
                         "stock",
-                        "universeId"
+                        "color",
+                        "categoryLvl0",
+                        "priceRange",
+                        "price",
+                        "condition",
+                        "region",
+                        "editorPicks",
+                        "watchMechanism",
+                        "discount",
+                        "sold",
+                        "directShippingEligible",
+                        "directShippingCountries",
+                        "localCountries",
+                        "sellerBadge",
+                        "isOfficialStore",
+                        "materialLvl0",
+                        "size0",
+                        "size1",
+                        "size2",
+                        "size3",
+                        "size4",
+                        "size5",
+                        "size6",
+                        "size7",
+                        "size8",
+                        "size9",
+                        "size10",
+                        "size11",
+                        "size12",
+                        "size13",
+                        "size14",
+                        "size15",
+                        "size16",
+                        "size17",
+                        "size18",
+                        "size19",
+                        "size20",
+                        "size21",
+                        "size22",
+                        "size23",
+                        "model",
+                        "dealEligible"
                     ],
-                    "facets": {
-                        "fields": [
-                            "brand",
-                            "universe",
-                            "country",
-                            "stock",
-                            "color",
-                            "categoryLvl0",
-                            "priceRange",
-                            "price",
-                            "condition",
-                            "region",
-                            "editorPicks",
-                            "watchMechanism",
-                            "discount",
-                            "sold",
-                            "directShippingEligible",
-                            "directShippingCountries",
-                            "localCountries",
-                            "sellerBadge",
-                            "isOfficialStore",
-                            "materialLvl0",
-                            "size0",
-                            "size1",
-                            "size2",
-                            "size3",
-                            "size4",
-                            "size5",
-                            "size6",
-                            "size7",
-                            "size8",
-                            "size9",
-                            "size10",
-                            "size11",
-                            "size12",
-                            "size13",
-                            "size14",
-                            "size15",
-                            "size16",
-                            "size17",
-                            "size18",
-                            "size19",
-                            "size20",
-                            "size21",
-                            "size22",
-                            "size23",
-                            "model",
-                            "dealEligible"
-                        ],
-                        "stats": [
-                            "price"
-                        ]
-                    },
-                    "sortBy": "relevance",
-                    "filters": {
-                        "catalogLinksWithoutLanguage": [
-                            "/women-bags/handbags/hermes/"
-                        ],
-                        "brand.id": [
-                            "14"
-                        ],
-                        "sold": ["0"] if x else None
-                    },
-                    "locale": {
-                        "country": "VN",
-                        "currency": "USD",
-                        "language": "us",
-                        "sizeType": "US"
-                    },
-                }
-                yield scrapy.Request(url=url, method='POST', headers=headers, body=json.dumps(body), callback=self.parse)
+                    "stats": [
+                        "price"
+                    ]
+                },
+                "sortBy": "relevance",
+                "filters": {
+                    "universe.id": ["1"],
+                    "catalogLinksWithoutLanguage": [
+                        "/women-bags/",
+                        "/men-bags/"
+                    ],
+                    "brand.id": [
+                        "14", "50", "17"
+                    ],
+                    "sold": ["1","0"]
+                },
+                "locale": {
+                    "country": "VN",
+                    "currency": "USD",
+                    "language": "us",
+                    "sizeType": "US"
+                },
+            }
+            yield scrapy.Request(url=url, method='POST', headers=headers, body=json.dumps(body), callback=self.parse)
 
     def parse(self, response):
         data = json.loads(response.body)
@@ -129,7 +130,8 @@ class ProductSpider(scrapy.Spider):
         item = BagRankingCrawlerItem()
         item['title'] = response.css(
             '.product-main-heading_productTitle__name__x_rnE::text').get()
-        price = response.xpath('//*[@id="__next"]/div/main/div[1]/div[4]/div/div[1]/div/div[2]/div').css('::text').getall()
+        price = response.xpath(
+            '//*[@id="__next"]/div/main/div[1]/div[4]/div/div[1]/div/div[2]/div').css('::text').getall()
         price = ''.join(price).strip()
         sold_re = re.compile(r'Sold at\s*\$(.+)\son\s*(.+)')
         sold = sold_re.search(price)
@@ -144,7 +146,6 @@ class ProductSpider(scrapy.Spider):
             else:
                 item['price'] = None
 
-      
         images = response.css(
             '.p_productPage__top__image__kNYZ4').css('img::attr(src)').getall()
         item['images'] = images
@@ -187,4 +188,7 @@ class ProductSpider(scrapy.Spider):
         item['condition'] = condition.strip()
         item['description'] = desc.strip()
         item['description'] = desc
+
+        item['brand'] = response.css('.product-main-heading_productTitle__brand__eLjp7').css(
+            'a::text').get().strip()
         yield item

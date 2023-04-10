@@ -5,9 +5,15 @@ from ..items import BagRankingCrawlerItem
 class ProductSpider(scrapy.Spider):
     name = "loveluxury"
     start_urls = [
-        "https://loveluxury.co.uk/shop/hermes/page/{}".format(i) for i in range(1, 100)]
+        *["https://loveluxury.co.uk/shop/hermes/page/{}".format(i) for i in range(1, 100)],
+        *["https://loveluxury.co.uk/shop/chanel/page/{}".format(i) for i in range(1, 100)],
+        *["https://loveluxury.co.uk/shop/louis-vuitton/page/{}".format(i) for i in range(1, 100)],
+    ]
 
     def parse(self, response):
+        url = response.url
+        brand = url.split('/')[4]
+
         # Extract product information
         products = response.css(".product-col")
         for product in products:
@@ -23,7 +29,8 @@ class ProductSpider(scrapy.Spider):
             item['price'] = price
             item['link'] = link
             item['thumbnail'] = thumbnail
-            yield response.follow(url=link, callback=self.product_parse, meta={'item': item})
+            item['brand'] = brand
+            yield response.follow(url=link, callback=self.product_parse, meta={'item': item,})
 
     def product_parse(self, response):
         item = response.meta['item']
