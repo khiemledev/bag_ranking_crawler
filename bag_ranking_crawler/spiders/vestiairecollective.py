@@ -18,113 +18,113 @@ class ProductSpider(scrapy.Spider):
             "x-usertoken": "anonymous-d08ba9dd-c8ae-4217-a003-2393905f4140",
             "x-correlation-id": "2c36a52c-3ba5-4b61-b9f7-457a92c11fab"
         }
-        for i in range(500):
-            body = {
-                "pagination": {
-                    "offset": i*96,
-                    "limit": 96
-                },
-                "fields": [
-                    "name",
-                    "description",
-                    "brand",
-                    "model",
-                    "country",
-                    "price",
-                    "discount",
-                    "link",
-                    "sold",
-                    "likes",
-                    "editorPicks",
-                    "shouldBeGone",
-                    "seller",
-                    "directShipping",
-                    "local",
-                    "pictures",
-                    "colors",
-                    "size",
-                    "stock",
-                    "universeId"
-                ],
-                "facets": {
+        for check in [True, False]:
+            for i in range(500):
+                body = {
+                    "pagination": {
+                        "offset": i*48,
+                        "limit": 48
+                    },
                     "fields": [
+                        "name",
+                        "description",
                         "brand",
-                        "universe",
-                        "country",
-                        "stock",
-                        "color",
-                        "categoryLvl0",
-                        "priceRange",
-                        "price",
-                        "condition",
-                        "region",
-                        "editorPicks",
-                        "watchMechanism",
-                        "discount",
-                        "sold",
-                        "directShippingEligible",
-                        "directShippingCountries",
-                        "localCountries",
-                        "sellerBadge",
-                        "isOfficialStore",
-                        "materialLvl0",
-                        "size0",
-                        "size1",
-                        "size2",
-                        "size3",
-                        "size4",
-                        "size5",
-                        "size6",
-                        "size7",
-                        "size8",
-                        "size9",
-                        "size10",
-                        "size11",
-                        "size12",
-                        "size13",
-                        "size14",
-                        "size15",
-                        "size16",
-                        "size17",
-                        "size18",
-                        "size19",
-                        "size20",
-                        "size21",
-                        "size22",
-                        "size23",
                         "model",
-                        "dealEligible"
+                        "country",
+                        "price",
+                        "discount",
+                        "link",
+                        "sold",
+                        "likes",
+                        "editorPicks",
+                        "shouldBeGone",
+                        "seller",
+                        "directShipping",
+                        "local",
+                        "pictures",
+                        "colors",
+                        "size",
+                        "stock",
+                        "universeId"
                     ],
-                    "stats": [
-                        "price"
-                    ]
-                },
-                "sortBy": "relevance",
-                "filters": {
-                    "universe.id": ["1"],
-                    "catalogLinksWithoutLanguage": [
-                        "/women-bags/",
-                        "/men-bags/"
-                    ],
-                    "brand.id": [
-                        "14", "50", "17"
-                    ],
-                    "sold": ["1","0"]
-                },
-                "locale": {
-                    "country": "VN",
-                    "currency": "USD",
-                    "language": "us",
-                    "sizeType": "US"
-                },
-            }
-            yield scrapy.Request(url=url, method='POST', headers=headers, body=json.dumps(body), callback=self.parse)
+                    "facets": {
+                        "fields": [
+                            "brand",
+                            "universe",
+                            "country",
+                            "stock",
+                            "color",
+                            "categoryLvl0",
+                            "priceRange",
+                            "price",
+                            "condition",
+                            "region",
+                            "editorPicks",
+                            "watchMechanism",
+                            "discount",
+                            "sold",
+                            "directShippingEligible",
+                            "directShippingCountries",
+                            "localCountries",
+                            "sellerBadge",
+                            "isOfficialStore",
+                            "materialLvl0",
+                            "size0",
+                            "size1",
+                            "size2",
+                            "size3",
+                            "size4",
+                            "size5",
+                            "size6",
+                            "size7",
+                            "size8",
+                            "size9",
+                            "size10",
+                            "size11",
+                            "size12",
+                            "size13",
+                            "size14",
+                            "size15",
+                            "size16",
+                            "size17",
+                            "size18",
+                            "size19",
+                            "size20",
+                            "size21",
+                            "size22",
+                            "size23",
+                            "model",
+                            "dealEligible"
+                        ],
+                        "stats": [
+                            "price"
+                        ]
+                    },
+                    "sortBy": "relevance",
+                    "filters": {
+                        "catalogLinksWithoutLanguage": [
+                            "/women-bags/",
+                        ],
+                        "brand.id": [
+                            "14", "50", "17"
+                        ],
+                        "sold": ["1"] if check else ['0']
+                    },
+                    "locale": {
+                        "country": "US",
+                        "currency": "USD",
+                        "language": "us",
+                        "sizeType": "US"
+                    },
+                }
+                yield scrapy.Request(url=url, method='POST', headers=headers, body=json.dumps(body), callback=self.parse)
 
     def parse(self, response):
         data = json.loads(response.body)
         items = data['items']
         for item in items:
-            yield scrapy.Request(url='https://www.vestiairecollective.com/'+item['link'], callback=self.parse_item)
+            brand = item['brand']['name']
+            yield scrapy.Request(url='https://www.vestiairecollective.com/'+item['link'], callback=self.parse_item, meta={'brand': brand})
 
     def parse_item(self, response):
         item = BagRankingCrawlerItem()
@@ -188,7 +188,5 @@ class ProductSpider(scrapy.Spider):
         item['condition'] = condition.strip()
         item['description'] = desc.strip()
         item['description'] = desc
-
-        item['brand'] = response.css('.product-main-heading_productTitle__brand__eLjp7').css(
-            'a::text').get().strip()
+        item['brand'] = response.meta['brand']
         yield item
