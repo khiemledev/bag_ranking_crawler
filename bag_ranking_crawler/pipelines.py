@@ -4,9 +4,12 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
 
-# useful for handling different item types with a single interface
-import pymongo
 import time
+
+import pymongo
+
+# useful for handling different item types with a single interface
+
 
 class BagPipeline:
     def __init__(self):
@@ -16,7 +19,7 @@ class BagPipeline:
         self.db = self.client[database_name]
         self.collection = self.db['bag_raw']
         self.collection.create_index('link', unique=True)
-        
+
     def process_item(self, item, spider):
         # check if duplicate in db
         toFind = item['link']
@@ -28,5 +31,5 @@ class BagPipeline:
         # add flag
         item['is_AI'] = False
         # insert to db
-        self.collection.insert_one(dict(item))
+        # self.collection.insert_one(dict(item))
         return item

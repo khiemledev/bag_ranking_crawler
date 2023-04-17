@@ -16,10 +16,12 @@ class BagRankingCrawlerItem(scrapy.Item):
     crawl_date = scrapy.Field()
     is_AI = scrapy.Field()
 
+    is_sold = scrapy.Field()
     sold_date = scrapy.Field()
 
     brand = scrapy.Field()
     model = scrapy.Field()
+    size = scrapy.Field()
     color = scrapy.Field()
     material = scrapy.Field()
     hardware = scrapy.Field()
