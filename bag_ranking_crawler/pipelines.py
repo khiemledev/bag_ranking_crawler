@@ -15,21 +15,20 @@ class BagPipeline:
     def __init__(self):
         self.client = pymongo.MongoClient(
             "mongodb://admin:Embery#1234@51.161.130.170:27017")
-        database_name = 'bag_ranking'
+        database_name = 'kl_bag_ranking'
         self.db = self.client[database_name]
         self.collection = self.db['bag_raw']
         self.collection.create_index('link', unique=True)
 
     def process_item(self, item, spider):
         # check if duplicate in db
-        toFind = item['link']
-        if_toFind = self.collection.find_one({"link": toFind})
-        if if_toFind:
+        existing_item = self.collection.find_one({"link": item['link']})
+        if existing_item:
             return item
         # add crawl date
         item['crawl_date'] = time.strftime("%Y-%m-%d", time.localtime())
         # add flag
         item['is_AI'] = False
         # insert to db
-        # self.collection.insert_one(dict(item))
+        self.collection.insert_one(dict(item))
         return item
