@@ -30,5 +30,7 @@ class BagPipeline:
         # add flag
         item['is_AI'] = False
         # insert to db
-        self.collection.insert_one(dict(item))
+        result = self.collection.insert_one(dict(item))
+        spider.logger.info(
+            'Item added to MongoDB with id %s', result.inserted_id)
         return item
