@@ -1,12 +1,14 @@
-import scrapy
-from ..items import BagRankingCrawlerItem
 import re
+
+import scrapy
+
+from ..items import BagRankingCrawlerItem
 
 
 class ProductSpider(scrapy.Spider):
     name = "janefinds"
     start_urls = [
-        "https://janefinds.com/collections/hermes?page={}".format(i) for i in range(1, 500)]
+        "https://janefinds.com/collections/hermes?page={}".format(i) for i in range(1, 35)]
 
     def parse(self, response):
         # Extract product information
@@ -24,6 +26,14 @@ class ProductSpider(scrapy.Spider):
             else:
                 price = None
             thumbnail = 'https:' + product.css('img').xpath("@src").get()
+
+            is_sold = product.css(
+                '.product-item__badge--sold').xpath(".//text()").get()
+            if is_sold is not None and "sold" in is_sold.lower():
+                is_sold = True
+            else:
+                is_sold = False
+
             item = BagRankingCrawlerItem()
             item['title'] = title
             item['price'] = price
@@ -71,12 +81,15 @@ class ProductSpider(scrapy.Spider):
             condition = condition.group(1)
         else:
             condition = None
-        item['measurements'] = size.strip()
-        item['color'] = color.strip()
-        item['hardware'] = hardware.strip()
-        item['material'] = material.strip()
-        item['condition'] = condition.strip()
-        item['description'] = desc.strip()
+        item['measurements'] = size.strip() if isinstance(size, str) else None
+        item['color'] = color.strip() if isinstance(color, str) else None
+        item['hardware'] = hardware.strip() if isinstance(
+            hardware, str) else None
+        item['material'] = material.strip() if isinstance(
+            material, str) else None
+        item['condition'] = condition.strip() if isinstance(
+            condition, str) else None
+        item['description'] = desc
         images = response.css('css-slider')
         images = images.css('img').xpath('@src').getall()
         images = ['https:' + image for image in images]
