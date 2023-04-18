@@ -9,8 +9,8 @@ class ProductSpider(scrapy.Spider):
     name = "bjluxury"
     start_urls = [
         *["https://bjluxury.com/all-hermes-bags/?product-page={}&count=36".format(
-            i) for i in range(1, 77)],
-        *["https://bjluxury.com/all-chanel-bags/?product-page={}&count=36".format(i) for i in range(1, 24)]
+            i) for i in range(1, 78)],
+        *["https://bjluxury.com/all-chanel-bags/?product-page={}&count=36".format(i) for i in range(1, 25)]
     ]
 
     def parse(self, response):
