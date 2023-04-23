@@ -32,10 +32,18 @@ class ProductSpider(scrapy.Spider):
                 break
 
             self.logger.info("Crawling URL get from RabbitMQ: %s", url)
-            yield scrapy.Request(url=url, callback=self.parse, meta={'method_frame': method_frame})
+            yield scrapy.Request(
+                url=url,
+                callback=self.parse,
+                meta={
+                    'method_frame': method_frame,
+                    'link': url,
+                },
+            )
 
     def parse(self, response):
         item = BagRankingCrawlerItem()
+        item['link'] = response.meta['link']
 
         title = response.css('.product_title').xpath('.//text()').get()
         item['title'] = title
