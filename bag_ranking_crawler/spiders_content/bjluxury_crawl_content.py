@@ -8,7 +8,7 @@ from bag_ranking_crawler.items import BagRankingCrawlerItem
 
 class ProductSpider(scrapy.Spider):
     name = "bjluxury_content"
-    queue_name = 'bag_ranking_crawler_link_bjluxury'
+    queue_name = 'bag_ranking_crawl_link_bjluxury'
 
     def start_requests(self):
         self.connection = pika.BlockingConnection(

@@ -15,7 +15,7 @@ class ProductSpider(scrapy.Spider):
 
     custom_settings = {
         "ITEM_PIPELINES": {
-            "bag_ranking_crawler.pipelines.CrawlingPipeline": 300,
+            "bag_ranking_crawler.pipelines.CrawlingLinkPipeline": 300,
         },
     }
 

@@ -46,18 +46,18 @@ class BagPipeline:
         return item
 
 
-class CrawlingPipeline:
+class CrawlingLinkPipeline:
     def __init__(self):
         self.rbmq_queue = 'bag_ranking_crawl_link'
         self.rbmq_connection = pika.BlockingConnection(
             pika.ConnectionParameters(host='localhost'))
         self.rbmq_channel = self.rbmq_connection.channel()
-        self.rbmq_channel.queue_declare(
-            queue=self.rbmq_queue,
-        )
 
     def process_item(self, item, spider):
         routing_key = self.rbmq_queue + "_" + item['website_name']
+        self.rbmq_channel.queue_declare(
+            queue=self.rbmq_queue + "_" + item['website_name'],
+        )
         self.rbmq_channel.basic_publish(
             exchange='',
             routing_key=routing_key,
