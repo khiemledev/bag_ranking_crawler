@@ -1,0 +1,6 @@
+strawberry-graphql
+fastapi
+uvicorn[standard]
+scrapy
+pymongo
+pika

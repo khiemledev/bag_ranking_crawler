@@ -9,7 +9,11 @@
 
 BOT_NAME = "bag_ranking_crawler"
 
-SPIDER_MODULES = ["bag_ranking_crawler.spiders"]
+SPIDER_MODULES = [
+    "bag_ranking_crawler.spiders",
+    "bag_ranking_crawler.spiders_link",
+    "bag_ranking_crawler.spiders_content",
+]
 NEWSPIDER_MODULE = "bag_ranking_crawler.spiders"
 COMMANDS_MODULE = 'bag_ranking_crawler.commands'
 RETRY_HTTP_CODES = [429]
@@ -64,9 +68,9 @@ CONCURRENT_REQUESTS_PER_IP = 0
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-    "bag_ranking_crawler.pipelines.BagPipeline": 300,
-}
+# ITEM_PIPELINES = {
+#     "bag_ranking_crawler.pipelines.BagPipeline": 300,
+# }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
