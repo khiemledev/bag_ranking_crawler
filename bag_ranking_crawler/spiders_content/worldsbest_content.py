@@ -76,6 +76,8 @@ class ProductSpider(scrapy.Spider):
 
     def parse(self, response):
         item = BagRankingCrawlerItem()
+        item['website_name'] = 'worldsbest'
+
         item['link'] = response.url
 
         title = response.css('h1.product-title::attr(content)').get()
