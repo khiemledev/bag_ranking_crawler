@@ -6,6 +6,7 @@
 
 import json
 import time
+from email import header
 
 import pika
 import pymongo
@@ -40,9 +41,9 @@ class BagPipeline:
         # add flag
         item['is_AI'] = False
         # insert to db
-        # result = self.collection.insert_one(dict(item))
-        # spider.logger.info(
-        #     'Item added to MongoDB with id %s', result.inserted_id)
+        result = self.collection.insert_one(dict(item))
+        spider.logger.info(
+            'Item added to MongoDB with id %s', result.inserted_id)
         return item
 
 
@@ -52,16 +53,26 @@ class CrawlingLinkPipeline:
         self.rbmq_connection = pika.BlockingConnection(
             pika.ConnectionParameters(host='localhost'))
         self.rbmq_channel = self.rbmq_connection.channel()
+        self.rbmq_channel.exchange_declare(
+            exchange='bag_ranking_crawl_link',
+            exchange_type='x-message-deduplication',
+            arguments=dict({'x-cache-size': '5'}),
+        )
 
     def process_item(self, item, spider):
         routing_key = self.rbmq_queue + "_" + item['website_name']
+        queue_name = self.rbmq_queue + "_" + item['website_name']
         self.rbmq_channel.queue_declare(
-            queue=self.rbmq_queue + "_" + item['website_name'],
+            queue=queue_name,
         )
+        self.rbmq_channel.queue_bind(queue_name, 'bag_ranking_crawl_link')
         self.rbmq_channel.basic_publish(
-            exchange='',
+            exchange='bag_ranking_crawl_link',
             routing_key=routing_key,
             body=json.dumps(dict(item)),
+            properties=pika.BasicProperties(
+                headers={'x-deduplication-header': item['link']},
+            ),
         )
         spider.logger.info(f" [x] Sent {dict(item)}")
         return item

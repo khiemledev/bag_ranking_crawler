@@ -10,6 +10,12 @@ class ProductSpider(scrapy.Spider):
     name = "bjluxury_content"
     queue_name = 'bag_ranking_crawl_link_bjluxury'
 
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            "bag_ranking_crawler.pipelines.BagPipeline": 300,
+        },
+    }
+
     def start_requests(self):
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters('localhost')
