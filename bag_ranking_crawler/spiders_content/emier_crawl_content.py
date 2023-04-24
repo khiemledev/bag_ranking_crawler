@@ -135,7 +135,6 @@ class ProductSpider(scrapy.Spider):
             condition = condition.group(1).strip()
         item['condition'] = condition
 
-        self.logger.info("Crawling URL done: %s", item)
-        # self.channel.basic_ack(
-        #     delivery_tag=response.meta['method_frame'].delivery_tag)
+        self.channel.basic_ack(
+            delivery_tag=response.meta['method_frame'].delivery_tag)
         yield item
