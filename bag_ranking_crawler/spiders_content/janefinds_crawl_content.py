@@ -42,15 +42,14 @@ class ProductSpider(scrapy.Spider):
             yield scrapy.Request(
                 url=url,
                 callback=self.parse,
-                meta={
-                    'method_frame': method_frame,
-                    'link': url,
-                },
+                meta={'method_frame': method_frame},
             )
 
     def parse(self, response):
-        link = response.meta['link']
         item = BagRankingCrawlerItem()
+        item['website_name'] = 'janefinds'
+
+        item['link'] = response.url
 
         title = response.css('.product__title').xpath('.//text()').get()
         price = response.css('.product__price').xpath('.//text()').get()
@@ -113,7 +112,6 @@ class ProductSpider(scrapy.Spider):
         if len(images) > 0:
             item['thumbnail'] = images[0]
 
-        self.logger.info(item)
         self.channel.basic_ack(
             delivery_tag=response.meta['method_frame'].delivery_tag)
         yield item

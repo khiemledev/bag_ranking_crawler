@@ -41,15 +41,14 @@ class ProductSpider(scrapy.Spider):
             yield scrapy.Request(
                 url=url,
                 callback=self.parse,
-                meta={
-                    'method_frame': method_frame,
-                    'link': url,
-                },
+                meta={'method_frame': method_frame},
             )
 
     def parse(self, response):
         item = BagRankingCrawlerItem()
-        item['link'] = response.meta['link']
+        item['website_name'] = 'bjluxury'
+
+        item['link'] = response.url
 
         title = response.css('.product_title').xpath('.//text()').get()
         item['title'] = title

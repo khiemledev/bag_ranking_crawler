@@ -41,15 +41,14 @@ class ProductSpider(scrapy.Spider):
             yield scrapy.Request(
                 url=url,
                 callback=self.parse,
-                meta={
-                    'method_frame': method_frame,
-                    'link': url,
-                },
+                meta={'method_frame': method_frame},
             )
 
     def parse(self, response):
         item = BagRankingCrawlerItem()
-        item['link'] = response.meta['link']
+        item['website_name'] = 'farfetch'
+
+        item['link'] = response.url
 
         title = response.css(
             'p[data-testid="product-short-description"]').xpath(".//text()").get()
@@ -68,5 +67,4 @@ class ProductSpider(scrapy.Spider):
 
         self.channel.basic_ack(
             delivery_tag=response.meta['method_frame'].delivery_tag)
-        self.logger.info("Crawled item: %s", item)
         yield item

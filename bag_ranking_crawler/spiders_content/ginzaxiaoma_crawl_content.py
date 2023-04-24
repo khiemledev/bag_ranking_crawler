@@ -42,6 +42,9 @@ class ProductSpider(scrapy.Spider):
 
     def parse(self, response):
         item = BagRankingCrawlerItem()
+        item['website_name'] = 'ginzaxiaoma'
+        item['link'] = response.url
+
         data = json.loads(response.body)
         data = data['data']
         images = data['albumPics'].split(',')
