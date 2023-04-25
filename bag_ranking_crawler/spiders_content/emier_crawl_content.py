@@ -38,15 +38,22 @@ class ProductSpider(scrapy.Spider):
     name = "emier_content"
     queue_name = 'bag_ranking_crawl_link_emier'
 
-    # custom_settings = {
-    #     "ITEM_PIPELINES": {
-    #         "bag_ranking_crawler.pipelines.BagPipeline": 300,
-    #     },
-    # }
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            "bag_ranking_crawler.pipelines.BagPipeline": 300,
+        },
+    }
 
     def start_requests(self):
+        credentials = pika.PlainCredentials(
+            'admin',
+            'emberyembery',
+        )
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters('localhost')
+            pika.ConnectionParameters(
+                host='rabbitmq.embery.com.au',
+                credentials=credentials,
+            )
         )
         self.channel = self.connection.channel()
         self.channel.queue_declare(

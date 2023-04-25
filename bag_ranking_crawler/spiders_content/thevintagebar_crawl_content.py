@@ -26,8 +26,15 @@ class ProductSpider(scrapy.Spider):
     }
 
     def start_requests(self):
+        credentials = pika.PlainCredentials(
+            'admin',
+            'emberyembery',
+        )
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters('localhost')
+            pika.ConnectionParameters(
+                host='rabbitmq.embery.com.au',
+                credentials=credentials,
+            )
         )
         self.channel = self.connection.channel()
         self.channel.queue_declare(

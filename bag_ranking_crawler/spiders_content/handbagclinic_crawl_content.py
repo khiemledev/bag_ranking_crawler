@@ -9,11 +9,11 @@ class ProductSpider(scrapy.Spider):
     name = "handbagclinic_content"
     start_urls = [f"https://www.handbagclinic.co.uk/hermes?page={i}&json=" for i in range(1, 3)]
 
-    # custom_settings = {
-    #     "ITEM_PIPELINES": {
-    #         "bag_ranking_crawler.pipelines.BagPipeline": 300,
-    #     },
-    # }
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            "bag_ranking_crawler.pipelines.BagPipeline": 300,
+        },
+    }
 
     def parse(self, response):
         data = json.loads(response.body)
