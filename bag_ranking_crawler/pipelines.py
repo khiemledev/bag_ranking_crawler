@@ -29,10 +29,11 @@ class BagPipeline:
         # check if duplicate in db
         existing_item = self.collection.find_one({"link": item['link']})
         if existing_item:
-            item['last_update'] = time.strftime("%Y-%m-%d", time.localtime())
+            existing_item['last_update'] = time.strftime(
+                "%Y-%m-%d", time.localtime())
             # update item in db
             self.collection.update_one(
-                {"link": item['link']}, {"$set": dict(item)})
+                {"link": item['link']}, {"$set": dict(existing_item)})
             spider.logger.info('Item updated in MongoDB')
             return item
 
@@ -49,9 +50,16 @@ class BagPipeline:
 
 class CrawlingLinkPipeline:
     def __init__(self):
+        credentials = pika.PlainCredentials(
+            'admin',
+            'emberyembery',
+        )
         self.rbmq_queue = 'bag_ranking_crawl_link'
         self.rbmq_connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='localhost'))
+            pika.ConnectionParameters(
+            host='rabbitmq.embery.com.au',
+            credentials=credentials,
+        ))
         self.rbmq_channel = self.rbmq_connection.channel()
         self.rbmq_channel.exchange_declare(
             exchange='bag_ranking_crawl_link',
