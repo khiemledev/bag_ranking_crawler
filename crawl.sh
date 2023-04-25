@@ -4,4 +4,7 @@ if [ -z "$name" ]; then
     exit 1
 fi
 
+mkdir -p log
+mkdir -p output
+
 scrapy crawl "$name" -o "output/$name.json" -L INFO --logfile "log/$name.log"
