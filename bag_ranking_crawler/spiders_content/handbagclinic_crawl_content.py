@@ -38,5 +38,4 @@ class ProductSpider(scrapy.Spider):
 
             item['is_sold'] = not product['buyable']
 
-            self.logger.info(item)
             yield item

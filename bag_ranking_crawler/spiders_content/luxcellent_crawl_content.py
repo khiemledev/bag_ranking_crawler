@@ -11,11 +11,11 @@ class ProductSpider(scrapy.Spider):
     name = "luxcellent_content"
     queue_name = 'bag_ranking_crawl_link_luxcellent'
 
-    # custom_settings = {
-    #     "ITEM_PIPELINES": {
-    #         "bag_ranking_crawler.pipelines.BagPipeline": 300,
-    #     },
-    # }
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            "bag_ranking_crawler.pipelines.BagPipeline": 300,
+        },
+    }
 
     def start_requests(self):
         credentials = pika.PlainCredentials(
@@ -24,9 +24,9 @@ class ProductSpider(scrapy.Spider):
         )
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                host='localhost',
-                # host='rabbitmq.embery.com.au',
-                # credentials=credentials,
+                # host='localhost',
+                host='rabbitmq.embery.com.au',
+                credentials=credentials,
             )
         )
         self.channel = self.connection.channel()
