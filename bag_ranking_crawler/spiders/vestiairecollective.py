@@ -121,6 +121,12 @@ def get_header():
 class ProductSpider(scrapy.Spider):
     name = "vestiairecollective"
 
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            "bag_ranking_crawler.pipelines.BagPipeline": 300,
+        },
+    }
+
     def start_requests(self):
         url = 'https://search.vestiairecollective.com/v1/product/search'
         headers = get_header()
@@ -133,6 +139,7 @@ class ProductSpider(scrapy.Spider):
         data = json.loads(response.body)
         items = data['items']
         for item in items:
+            item['website_name'] = 'vestiairecollective'
             title = item['name']
             brand = item['brand']['name']
             desc = item['description']
@@ -211,6 +218,7 @@ class ProductSpider(scrapy.Spider):
         condition = condition_re.search(desc)
         if condition is not None:
             condition = condition.group(1)
+            condition = condition.replace("More info", "")
         else:
             condition = None
 
