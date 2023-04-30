@@ -24,6 +24,7 @@ class ProductSpider(scrapy.Spider):
         )
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters(
+                # host='localhost',
                 host='rabbitmq.embery.com.au',
                 credentials=credentials,
             )
@@ -60,10 +61,11 @@ class ProductSpider(scrapy.Spider):
 
         title = response.css('.product__title').xpath('.//text()').get()
         price = response.css('.product__price').xpath('.//text()').get()
+        brand = response.css('.product__subtitle p::text').get()
 
         item['title'] = title
         item['price'] = price
-        item['link'] = link
+        item['brand'] = brand
 
         desc = response.css(
             '.product__description-inner').xpath('.//text()').getall()

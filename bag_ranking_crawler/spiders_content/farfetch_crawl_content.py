@@ -59,11 +59,13 @@ class ProductSpider(scrapy.Spider):
 
         title = response.css(
             'p[data-testid="product-short-description"]').xpath(".//text()").get()
+        brand = response.css('h1.ltr-i980jo a::text').get()
         price = response.css(
             'p[data-component="PriceLarge"]').xpath(".//text()").get()
         thumbnail = response.css('img.ltr-1w2up3s').xpath('@src').get()
 
         item['title'] = title
+        item['brand'] = brand
         item['price'] = price
         item['thumbnail'] = thumbnail
         desc = response.css('.ltr-4y8w0i-Body').css('::text').getall()

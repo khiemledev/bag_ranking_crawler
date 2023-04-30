@@ -62,6 +62,9 @@ class ProductSpider(scrapy.Spider):
         title = response.css('h1.PDPDesktop-name span::text').get()
         item['title'] = title.strip() if title is not None else None
 
+        brand = response.css('h2.PDPDesktop-designerCategoryName meta[itemprop="brand"]::attr(content)').get()
+        item['brand'] = brand.strip() if brand is not None else None
+
         price = response.css('.PriceContainer-price::text').get()
         item['price'] = price.strip() if price is not None else None
 
