@@ -37,11 +37,11 @@ class ProductSpider(scrapy.Spider):
     name = "michaelsconsignment_content"
     queue_name = 'bag_ranking_crawl_link_michaelsconsignment'
 
-    # custom_settings = {
-    #     "ITEM_PIPELINES": {
-    #         "bag_ranking_crawler.pipelines.BagPipeline": 300,
-    #     },
-    # }
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            "bag_ranking_crawler.pipelines.BagPipeline": 300,
+        },
+    }
 
     def start_requests(self):
         credentials = pika.PlainCredentials(
@@ -50,9 +50,9 @@ class ProductSpider(scrapy.Spider):
         )
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                host='localhost',
-                # host='rabbitmq.embery.com.au',
-                # credentials=credentials,
+                # host='localhost',
+                host='rabbitmq.embery.com.au',
+                credentials=credentials,
             )
         )
         self.channel = self.connection.channel()
@@ -83,6 +83,9 @@ class ProductSpider(scrapy.Spider):
         item = BagRankingCrawlerItem()
         item['link'] = response.url
         item['website_name'] = 'michaelsconsignment'
+
+        brand = response.css('.detail .vendor a::text').get()
+        item['brand'] = brand
 
         title = response.css('h1.title::text').get()
         item['title'] = title.strip() if title is not None else None
@@ -138,8 +141,6 @@ class ProductSpider(scrapy.Spider):
 
         measures = get_measurements(raw_desc)
         item['measurements'] = measures
-
-        self.logger.info(item)
 
         # self.channel.basic_ack(
         #     delivery_tag=response.meta['method_frame'].delivery_tag)
