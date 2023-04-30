@@ -24,9 +24,9 @@ class ProductSpider(scrapy.Spider):
         )
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                # host='localhost',
-                host='rabbitmq.embery.com.au',
-                credentials=credentials,
+                host='localhost',
+                # host='rabbitmq.embery.com.au',
+                # credentials=credentials,
             )
         )
         self.channel = self.connection.channel()
@@ -62,6 +62,15 @@ class ProductSpider(scrapy.Spider):
         title = response.css('.product__title').xpath('.//text()').get()
         price = response.css('.product__price').xpath('.//text()').get()
         brand = response.css('.product__subtitle p::text').get()
+
+        add_to_cart_text = response.css('.add-to-cart__text::text').getall()
+        if len(add_to_cart_text):
+            add_to_cart_text = add_to_cart_text[0].strip().lower()
+            if add_to_cart_text == 'sold out':
+                is_sold = True
+            else:
+                is_sold = False
+            item['is_sold'] = is_sold
 
         item['title'] = title
         item['price'] = price
@@ -113,7 +122,7 @@ class ProductSpider(scrapy.Spider):
             material, str) else None
         item['condition'] = condition.strip() if isinstance(
             condition, str) else None
-        item['description'] = desc
+        item['description'] = desc.strip()
         images = response.css('css-slider')
         images = images.css('img').xpath('@src').getall()
         images = ['https:' + image for image in images]

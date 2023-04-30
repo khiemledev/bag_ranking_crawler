@@ -96,10 +96,8 @@ class ProductSpider(scrapy.Spider):
         price = ''.join(price)
         item['price'] = price
 
-        if price and price.lower() == 'sold':
-            item['is_sold'] = True
-        else:
-            item['is_sold'] = False
+        is_sold = response.css('button[data-action="add-to-cart"]').get()
+        is_sold = is_sold is None
 
         desc_raw = response.css(
             '.ProductMeta__Description').xpath(".//text()").extract()

@@ -6,6 +6,14 @@ import scrapy
 from bag_ranking_crawler.items import BagRankingCrawlerItem
 
 
+def _strip(v):
+    if v is None:
+        return
+    v = v.strip()
+    if v == '':
+        return
+    return v
+
 class ProductSpider(scrapy.Spider):
     name = "bjluxury_content"
     queue_name = 'bag_ranking_crawl_link_bjluxury'
@@ -58,36 +66,62 @@ class ProductSpider(scrapy.Spider):
         item['link'] = response.url
 
         title = response.css('.product_title').xpath('.//text()').get()
-        item['title'] = title
+        item['title'] = _strip(title)
+
+        price = response.css('.woocommerce-Price-amount.amount').xpath('.//text()').get()
+        item['price'] = _strip(price)
+
+        if not item['price']:
+            item['is_sold'] = True
+        else:
+            item['is_sold'] = False
 
         shop_attributes = response.css('.shop_attributes')
-        item['brand'] = shop_attributes.css(
+
+        brand = shop_attributes.css(
             '.woocommerce-product-attributes-item--brand > td'
         ).xpath('.//text()').get()
-        item['model'] = shop_attributes.css(
+        item['brand'] = _strip(brand)
+
+        model = shop_attributes.css(
             '.woocommerce-product-attributes-item--attribute_pa_model > td'
         ).xpath('.//text()').get()
-        item['size'] = shop_attributes.css(
+        item['model'] = _strip(model)
+
+        size = shop_attributes.css(
             '.woocommerce-product-attributes-item--attribute_pa_size > td'
         ).xpath('.//text()').get()
-        item['color'] = shop_attributes.css(
+        item['size'] = _strip(size)
+
+        color = shop_attributes.css(
             '.woocommerce-product-attributes-item--secondary-color > td'
         ).xpath('.//text()').get()
-        item['material'] = shop_attributes.css(
+        item['color'] = _strip(color)
+
+        material = shop_attributes.css(
             '.woocommerce-product-attributes-item--attribute_pa_material > td'
         ).xpath('.//text()').get()
-        item['hardware'] = shop_attributes.css(
+        item['material'] = _strip(material)
+
+        hardware = shop_attributes.css(
             '.woocommerce-product-attributes-item--secondary-hardware > td'
         ).xpath('.//text()').get()
-        item['year'] = shop_attributes.css(
+        item['hardware'] = _strip(hardware)
+
+        year = shop_attributes.css(
             '.woocommerce-product-attributes-item--year > td'
         ).xpath('.//text()').get()
-        item['condition'] = shop_attributes.css(
+        item['year'] = _strip(year)
+
+        condition = shop_attributes.css(
             '.woocommerce-product-attributes-item--condition-rating > td'
         ).xpath('.//text()').get()
-        item['measurements'] = shop_attributes.css(
+        item['condition'] = _strip(condition)
+
+        measures = shop_attributes.css(
             '.woocommerce-product-attributes-item--measurements > td'
         ).xpath('.//text()').get()
+        item['measurements'] = _strip(measures)
 
         images = response.css('.summary-before')
         images = images.css('img').xpath('@src').getall()
@@ -96,5 +130,4 @@ class ProductSpider(scrapy.Spider):
 
         self.channel.basic_ack(
             delivery_tag=response.meta['method_frame'].delivery_tag)
-        self.logger.info("Crawling URL done: %s", item)
         yield item

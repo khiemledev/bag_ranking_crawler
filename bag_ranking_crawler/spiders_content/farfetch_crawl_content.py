@@ -69,7 +69,7 @@ class ProductSpider(scrapy.Spider):
         item['price'] = price
         item['thumbnail'] = thumbnail
         desc = response.css('.ltr-4y8w0i-Body').css('::text').getall()
-        item['description'] = '\n'.join(desc)
+        item['description'] = '\n'.join(desc).strip()
         images = response.css('.e1dvjpls0')
         images = images.css('img').xpath('@src').getall()
         item['images'] = images

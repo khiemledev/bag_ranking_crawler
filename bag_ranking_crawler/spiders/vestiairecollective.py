@@ -121,11 +121,11 @@ def get_header():
 class ProductSpider(scrapy.Spider):
     name = "vestiairecollective"
 
-    custom_settings = {
-        "ITEM_PIPELINES": {
-            "bag_ranking_crawler.pipelines.BagPipeline": 300,
-        },
-    }
+    # custom_settings = {
+    #     "ITEM_PIPELINES": {
+    #         "bag_ranking_crawler.pipelines.BagPipeline": 300,
+    #     },
+    # }
 
     def start_requests(self):
         url = 'https://search.vestiairecollective.com/v1/product/search'
@@ -172,9 +172,16 @@ class ProductSpider(scrapy.Spider):
     def parse_item(self, response):
         item = response.meta['item']
 
-        price = response.xpath(
-            '//*[@id="__next"]/div/main/div[1]/div[4]/div/div[1]/div/div[2]/div').css('::text').getall()
-        price = ''.join(price).strip()
+        # price = response.xpath(
+        #     '//*[@id="__next"]/div/main/div[1]/div[4]/div/div[1]/div/div[2]/div').css('::text').getall()
+        # price = ''.join(price).strip()
+        price = response.css(
+            'span[class^="product-price_productPrice__price"]::text').get()
+        if price is None:
+            price = response.css(
+                'div[class="product-price_productPrice__YKAe0"]').xpath(".//text()").extract()
+            price = ''.join(price).strip()
+
         sold_re = re.compile(r'Sold at\s*\$(.+)\son\s*(.+)')
         sold = sold_re.search(price)
         if sold is not None:
