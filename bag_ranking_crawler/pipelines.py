@@ -15,6 +15,10 @@ import pymongo
 
 
 class BagPipeline:
+    custom_settings = {
+        'LOG_FILE': 'log/crawling_content.log',
+    }
+
     def __init__(self):
         # Load env variables
         self.mongo_host = getenv('MONGO_CONNECTION_STRING')
@@ -52,6 +56,10 @@ class BagPipeline:
 
 
 class CrawlingLinkPipeline:
+    custom_settings = {
+        'LOG_FILE': 'log/crawling_link.log',
+    }
+
     def __init__(self):
         self.rabbitmq_host = getenv('RABBITMQ_HOST', 'localhost')
         self.rabbitmq_username = getenv('RABBITMQ_USERNAME')
@@ -67,7 +75,7 @@ class CrawlingLinkPipeline:
         self.rbmq_connection = pika.BlockingConnection(
             pika.ConnectionParameters(
                 host=self.rabbitmq_host,
-                # credentials=credentials if self.rabbitmq_username else None,
+                credentials=credentials if self.rabbitmq_username else None,
             ),
         )
         self.rbmq_channel = self.rbmq_connection.channel()

@@ -16,7 +16,7 @@ SPIDER_MODULES = [
 ]
 NEWSPIDER_MODULE = "bag_ranking_crawler.spiders"
 COMMANDS_MODULE = 'bag_ranking_crawler.commands'
-RETRY_HTTP_CODES = [429]
+RETRY_HTTP_CODES = [404]
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -103,3 +103,4 @@ FEED_EXPORT_ENCODING = "utf-8"
 LOG_LEVEL = 'INFO'
 LOG_FORMAT = '%(asctime)s [%(levelname)s] %(filename)s %(funcName)s (%(lineno)d) %(message)s'
 LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'
+LOG_STDOUT = True

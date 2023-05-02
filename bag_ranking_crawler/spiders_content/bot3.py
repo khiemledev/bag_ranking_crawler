@@ -18,6 +18,10 @@ def _strip(v):
 class ProductSpider(scrapy.Spider):
     name = "bot3"
 
+    custom_settings = {
+        'LOG_FILE': 'log/bot3.log',
+    }
+
     def start_requests(self):
         self.client = pymongo.MongoClient(
             "mongodb://admin:Embery#1234@51.161.130.170:27017")
