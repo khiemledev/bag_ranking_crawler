@@ -139,6 +139,12 @@ class ProductSpider(scrapy.Spider):
         elif website == 'worldsbest':
             # TOOD: check later
             self.logger.info("Not enough information to check sold status")
+        elif website == 'saclab':
+            is_sold = response.css('.product__sold-inner').get()
+            is_sold = True if is_sold is not None else None
+            if is_sold:
+                is_sold = True
+                sold_date = datetime.now()
 
         updates = {}
         if is_sold is not None:
