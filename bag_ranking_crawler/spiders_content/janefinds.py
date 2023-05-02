@@ -1,5 +1,6 @@
 import json
 import re
+from os import getenv
 
 import pika
 import scrapy
@@ -15,18 +16,21 @@ class ProductSpider(scrapy.Spider):
         "ITEM_PIPELINES": {
             "bag_ranking_crawler.pipelines.BagPipeline": 300,
         },
+        "RABBITMQ_HOST": getenv('RABBITMQ_HOST', ''),
+        "RABBITMQ_USERNAME": getenv('RABBITMQ_USERNAME', ''),
+        "RABBITMQ_PASSWORD": getenv('RABBITMQ_PASSWORD', ''),
     }
 
     def start_requests(self):
         credentials = pika.PlainCredentials(
-            'admin',
-            'emberyembery',
+            self.settings.get('RABBITMQ_USERNAME'),
+            self.settings.get('RABBITMQ_PASSWORD'),
         )
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                host='localhost',
-                # host='rabbitmq.embery.com.au',
-                # credentials=credentials,
+                # host='localhost',
+                host=self.settings.get('RABBITMQ_HOST'),
+                credentials=credentials,
             )
         )
         self.channel = self.connection.channel()
